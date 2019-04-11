@@ -1,0 +1,54 @@
+# User API routes
+GET		/api/v1/user					controllers.UserController.getAll(request: Request, min: Integer, max: Integer)
+GET		/api/v1/user/size				controllers.UserController.getSize(request: Request)
+GET		/api/v1/user/page/size			controllers.UserController.getPageSize(request: Request, pageSize: Integer)
+GET		/api/v1/user/:id				controllers.UserController.get(request: Request, id: Long)
+POST	/api/v1/user					controllers.UserController.create(request: Request)
+PUT		/api/v1/user/:id				controllers.UserController.update(request: Request, id: Long)
+DELETE	/api/v1/user/:id				controllers.UserController.delete(request: Request, id: Long)
+
+
+# Login/Logout API routes
+POST	/api/v1/login					controllers.LoginController.login(request: Request)
+POST	/api/v1/logout					controllers.LoginController.logout(request: Request)
+
+
+# Deposit API routes
+GET		/api/v1/deposit					controllers.DepositController.getAll(request: Request, min: Integer, max: Integer)
+GET		/api/v1/deposit/size			controllers.DepositController.getSize(request: Request)
+GET		/api/v1/deposit/page/size		controllers.DepositController.getPageSize(request: Request, pageSize: Integer)
+GET		/api/v1/deposit/:id				controllers.DepositController.get(request: Request, id: Long)
+POST	/api/v1/deposit					controllers.DepositController.create(request: Request)
+PUT		/api/v1/deposit/:id				controllers.DepositController.update(request: Request, id: Long)
+DELETE	/api/v1/deposit/:id				controllers.DepositController.delete(request: Request, id: Long)
+
+
+# Withdrawal API routes
+GET		/api/v1/withdrawal				controllers.WithdrawalController.getAll(request: Request, min: Integer, max: Integer)
+GET		/api/v1/withdrawal/size			controllers.WithdrawalController.getSize(request: Request)
+GET		/api/v1/withdrawal/page/size	controllers.WithdrawalController.getPageSize(request: Request, pageSize: Integer)
+GET		/api/v1/withdrawal/:id			controllers.WithdrawalController.get(request: Request, id: Long)
+POST	/api/v1/withdrawal				controllers.WithdrawalController.create(request: Request)
+PUT		/api/v1/withdrawal/:id			controllers.WithdrawalController.update(request: Request, id: Long)
+DELETE	/api/v1/withdrawal/:id			controllers.WithdrawalController.delete(request: Request, id: Long)
+
+
+# Payment API routes
+GET		/api/v1/payment					controllers.PaymentController.getAll(request: Request, min: Integer, max: Integer)
+GET		/api/v1/payment/size			controllers.PaymentController.getSize(request: Request)
+GET		/api/v1/payment/page/size		controllers.PaymentController.getPageSize(request: Request, pageSize: Integer)
+GET		/api/v1/payment/:id				controllers.PaymentController.get(request: Request, id: Long)
+POST	/api/v1/payment					controllers.PaymentController.create(request: Request)
+PUT		/api/v1/payment/:id				controllers.PaymentController.update(request: Request, id: Long)
+DELETE	/api/v1/payment/:id				controllers.PaymentController.delete(request: Request, id: Long)
+
+
+# Picture API routes
+GET		/api/v1/picture					controllers.PictureController.getAll(request: Request, min: Integer, max: Integer)
+GET		/api/v1/picture/size			controllers.PictureController.getSize(request: Request)
+GET		/api/v1/picture/page/size		controllers.PictureController.getPageSize(request: Request, pageSize: Integer)
+GET		/api/v1/picture/:id				controllers.PictureController.get(request: Request, id: Long)
+POST	/api/v1/picture					controllers.PictureController.create(request: Request)
+PUT		/api/v1/picture/:id				controllers.PictureController.update(request: Request, id: Long)
+DELETE	/api/v1/picture/:id				controllers.PictureController.delete(request: Request, id: Long)
+GET  	/api/v1/images/*file			controllers.Assets.at(path="/public/images", file)
