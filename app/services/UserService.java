@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import models.Function;
+import models.Permission;
 import models.Role;
 import models.Transaction;
 import models.Type;
@@ -18,10 +18,10 @@ public class UserService {
 	private List<User> users;
 	private ObjectNode userNode;
 	private Role role;
-	private Function createFunction = Function.find.query().where().eq("name", "create_user").findOne();
-	private Function readFunction = Function.find.query().where().eq("name", "read_user").findOne();
-	private Function updateFunction = Function.find.query().where().eq("name", "update_user").findOne();
-	private Function deleteFunction = Function.find.query().where().eq("name", "delete_user").findOne();
+	private Permission createPermission = Permission.find.query().where().eq("name", "create_user").findOne();
+	private Permission readPermission = Permission.find.query().where().eq("name", "read_user").findOne();
+	private Permission updatePermission = Permission.find.query().where().eq("name", "update_user").findOne();
+	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_user").findOne();
 	
 	public User getUser(Http.Request request) {
 		Long checker = Long.parseLong(request.session().getOptional("id").get());
@@ -29,7 +29,7 @@ public class UserService {
 	}
 	
 	public User get(Http.Request request, Long id) {
-		if(hasPermission(request, id, createFunction)) {
+		if(hasPermission(request, id, createPermission)) {
 			return User.find.byId(id);
 		} else {
 			throw new IllegalArgumentException();
@@ -37,7 +37,7 @@ public class UserService {
 	}
 	
 	public List<User> getAll(Http.Request request, Integer min, Integer max) {
-		if(hasPermission(request, null, readFunction)) {
+		if(hasPermission(request, null, readPermission)) {
 			return User.find.query()
 					.where()
 					.orderBy("date desc")
@@ -50,7 +50,7 @@ public class UserService {
 	}
 	
 	public Integer getSize(Http.Request request) {
-		if(hasPermission(request, null, deleteFunction)) {
+		if(hasPermission(request, null, deletePermission)) {
 			return User.find.all().size();
 		} else {
 			throw new IllegalArgumentException();
@@ -75,7 +75,7 @@ public class UserService {
 	}
 	
 	public User update(Http.Request request, Long id) {
-		if(hasPermission(request, id, updateFunction)) { 
+		if(hasPermission(request, id, updatePermission)) { 
 			user = User.find.byId(id);
 			userNode = (ObjectNode) request.body().asJson().get("user");
 			
@@ -93,7 +93,7 @@ public class UserService {
 	}
 	
 	public User delete(Http.Request request, Long id) {
-		if(hasPermission(request, id, updateFunction)) { 
+		if(hasPermission(request, id, updatePermission)) { 
 			user = getUser(request);
 			
 			user.status = "deactivated";
@@ -104,7 +104,7 @@ public class UserService {
 		}
 	}
 	
-	public Boolean hasPermission(Http.Request request, Long id, Function function) {
+	public Boolean hasPermission(Http.Request request, Long id, Permission function) {
 		user = getUser(request);
 		role = user.roles.get(0);
 		
@@ -119,7 +119,7 @@ public class UserService {
 				return false;
 			}
 		} else {
-			if(role.functions.contains(function)) {
+			if(role.permissions.contains(function)) {
 				return true;
 			} else {
 				return false;

@@ -16,8 +16,8 @@ import io.ebean.Finder;
 import io.ebean.Model;
 
 @Entity
-@Table(name = "functions")
-public class Function extends Model {
+@Table(name = "permissions")
+public class Permission extends Model {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,10 +29,10 @@ public class Function extends Model {
 	
 	//Relationships
 	
-	@ManyToMany(mappedBy = "functions") @JsonIgnore
+	@ManyToMany(mappedBy = "permissions") @JsonIgnore
 	public List<Role> roles = new ArrayList<>();
 
 	
-	public static final Finder<Long, Function> find = new Finder<>(Function.class);
+	public static final Finder<Long, Permission> find = new Finder<>(Permission.class);
 	
 }

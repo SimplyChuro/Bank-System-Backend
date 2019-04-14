@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.typesafe.config.ConfigFactory;
 
-import models.Function;
+import models.Permission;
 import models.Role;
 import models.Type;
 import models.User;
@@ -16,16 +16,16 @@ public class DataGenerator {
 	private static final String ADMIN_PASSWORD = "custom.settings.admin.password";
 	
 	public Role role;
-	public Function function;
+	public Permission permission;
 	public Type type;
 	public User admin;
 	public List<User> users;
 	public List<Role> roles;
 	public List<Type> types;
-	public List<Function> functions;
-	public List<Function> adminFunctions = new ArrayList<>();
-	public List<Function> moderatorFunctions = new ArrayList<>();
-	public List<Function> staffFunctions = new ArrayList<>();
+	public List<Permission> permissions;
+	public List<Permission> adminPermissions = new ArrayList<>();
+	public List<Permission> moderatorPermissions = new ArrayList<>();
+	public List<Permission> staffPermissions = new ArrayList<>();
 	
 	
 	public void generate() {
@@ -69,19 +69,19 @@ public class DataGenerator {
 		role = new Role();
 		role.status = "active";
 		role.name = "admin";
-		role.functions = adminFunctions;
+		role.permissions = adminPermissions;
 		role.save();
 		
 		role = new Role();
 		role.status = "active";
 		role.name = "moderator";
-		role.functions = moderatorFunctions;
+		role.permissions = moderatorPermissions;
 		role.save();
 		
 		role = new Role();
 		role.status = "active";
 		role.name = "staff";
-		role.functions = staffFunctions;
+		role.permissions = staffPermissions;
 		role.save();
 		
 		role = new Role();
@@ -94,201 +94,203 @@ public class DataGenerator {
 	public void generateFunctions() {
 		
 		//User functions		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_user";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_user";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_user";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
-		staffFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_user";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		staffPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "update_user";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_user";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_user";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_user";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
 		//Deposit functions		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_deposit";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_deposit";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_deposit";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
-		staffFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_deposit";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		staffPermissions.add(permission);
 		
-		function.name = "update_deposit";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_deposit";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_deposit";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_deposit";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
 		//Payment function		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_payment";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_payment";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_payment";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
-		staffFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_payment";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		staffPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "update_payment";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_payment";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_payment";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_payment";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
 		//Withdrawal function		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_withdrawal";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_withdrawal";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_withdrawal";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
-		staffFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_withdrawal";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		staffPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "update_withdrawal";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_withdrawal";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_withdrawal";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_withdrawal";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
 		//Staff function		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_staff";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_staff";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_staff";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_staff";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "update_staff";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_staff";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_staff";
-		function.save();
-		adminFunctions.add(function);
-		moderatorFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_staff";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
 		//Moderator function		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_moderator";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_moderator";
+		permission.save();
+		adminPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_moderator";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_moderator";
+		permission.save();
+		adminPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "update_moderator";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_moderator";
+		permission.save();
+		adminPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_moderator";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_moderator";
+		permission.save();
+		adminPermissions.add(permission);
 		
 		//Admin function		
-		function = new Function();
-		function.status = "active";
-		function.name = "create_admin";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_admin";
+		permission.save();
+		adminPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "read_admin";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_admin";
+		permission.save();
+		adminPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "update_admin";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_admin";
+		permission.save();
+		adminPermissions.add(permission);
 		
-		function = new Function();
-		function.status = "active";
-		function.name = "delete_admin";
-		function.save();
-		adminFunctions.add(function);
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_admin";
+		permission.save();
+		adminPermissions.add(permission);
 			
 	}
 	
@@ -338,8 +340,8 @@ public class DataGenerator {
 	}
 	
 	public Boolean noFunctions() {
-		functions = Function.find.all();
-		if(functions.isEmpty()) {
+		permissions = Permission.find.all();
+		if(permissions.isEmpty()) {
 			return true;
 		} else {
 			return false;

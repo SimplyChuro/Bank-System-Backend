@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import models.Function;
+import models.Permission;
 import models.Role;
 import models.Transaction;
 import models.Type;
@@ -21,10 +21,10 @@ public class WithdrawalService {
 	private User user;
 	private Role role;
 	private Type withdrawalType = Type.find.query().where().eq("name", "withdrawal").findOne();
-	private Function createFunction = Function.find.query().where().eq("name", "create_withdrawal").findOne();
-	private Function readFunction = Function.find.query().where().eq("name", "read_withdrawal").findOne();
-	private Function updateFunction = Function.find.query().where().eq("name", "update_withdrawal").findOne();
-	private Function deleteFunction = Function.find.query().where().eq("name", "delete_withdrawal").findOne();
+	private Permission createPermission = Permission.find.query().where().eq("name", "create_withdrawal").findOne();
+	private Permission readPermission = Permission.find.query().where().eq("name", "read_withdrawal").findOne();
+	private Permission updatePermission = Permission.find.query().where().eq("name", "update_withdrawal").findOne();
+	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_withdrawal").findOne();
 	
 	public User getUser(Http.Request request) {
 		Long checker = Long.parseLong(request.session().getOptional("id").get());
@@ -32,7 +32,7 @@ public class WithdrawalService {
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
-		if(hasPermission(request, id, createFunction)) {
+		if(hasPermission(request, id, createPermission)) {
 			return Transaction.find.byId(id);
 		} else {
 			throw new IllegalArgumentException();
@@ -41,7 +41,7 @@ public class WithdrawalService {
 	
 	public List<Transaction> getAll(Http.Request request, Integer min, Integer max) {
 		user = getUser(request);
-		if(hasPermission(request, null, readFunction)) {
+		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.query()
 					.where()
 					.eq("types.name", "withdrawal")
@@ -62,7 +62,7 @@ public class WithdrawalService {
 	
 	public Integer getSize(Http.Request request) {
 		user = getUser(request);
-		if(hasPermission(request, null, readFunction)) {
+		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.all().size();
 		} else {
 			return Transaction.find.query().where().eq("types.name", "withdrawal").and().eq("users.id", user.id).findList().size();
@@ -92,7 +92,7 @@ public class WithdrawalService {
 	}
 	
 	public Transaction update(Http.Request request, Long id) {
-		if(hasPermission(request, id, updateFunction)) { 
+		if(hasPermission(request, id, updatePermission)) { 
 			transaction = Transaction.find.byId(id);
 //			transactionNode = (ObjectNode) request.body().asJson().get("withdrawal");
 //			transaction.amount = transactionNode.findValue("amount").asDouble();	
@@ -105,7 +105,7 @@ public class WithdrawalService {
 	}
 	
 	public Transaction delete(Http.Request request, Long id) {
-		if(hasPermission(request, id, deleteFunction)) { 
+		if(hasPermission(request, id, deletePermission)) { 
 			transaction = Transaction.find.byId(id);
 			transaction.status = "deleted";
 			transaction.update();
@@ -116,7 +116,7 @@ public class WithdrawalService {
 		}
 	}
 	
-	public Boolean hasPermission(Http.Request request, Long id, Function function) {
+	public Boolean hasPermission(Http.Request request, Long id, Permission function) {
 		user = getUser(request);
 		role = user.roles.get(0);
 		
@@ -132,7 +132,7 @@ public class WithdrawalService {
 				return false;
 			}
 		} else {
-			if(role.functions.contains(function)) {
+			if(role.permissions.contains(function)) {
 				return true;
 			} else {
 				return false;

@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import models.Function;
+import models.Permission;
 import models.Role;
 import models.Transaction;
 import models.Type;
@@ -22,10 +22,10 @@ public class PaymentService {
 	private Role role;
 	private String bankAccount;
 	private Type paymentType = Type.find.query().where().eq("name", "payment").findOne();
-	private Function createFunction = Function.find.query().where().eq("name", "create_payment").findOne();
-	private Function readFunction = Function.find.query().where().eq("name", "read_payment").findOne();
-	private Function updateFunction = Function.find.query().where().eq("name", "update_payment").findOne();
-	private Function deleteFunction = Function.find.query().where().eq("name", "delete_payment").findOne();
+	private Permission createPermission = Permission.find.query().where().eq("name", "create_payment").findOne();
+	private Permission readPermission = Permission.find.query().where().eq("name", "read_payment").findOne();
+	private Permission updatePermission = Permission.find.query().where().eq("name", "update_payment").findOne();
+	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_payment").findOne();
 	
 	public User getUser(Http.Request request) {
 		Long checker = Long.parseLong(request.session().getOptional("id").get());
@@ -33,7 +33,7 @@ public class PaymentService {
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
-		if(hasPermission(request, id, createFunction)) {
+		if(hasPermission(request, id, createPermission)) {
 			return Transaction.find.byId(id);
 		} else {
 			throw new IllegalArgumentException();
@@ -42,7 +42,7 @@ public class PaymentService {
 	
 	public List<Transaction> getAll(Http.Request request, Integer min, Integer max) {
 		user = getUser(request);
-		if(hasPermission(request, null, readFunction)) {
+		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.query()
 					.where()
 					.eq("types.name", "payment")
@@ -63,7 +63,7 @@ public class PaymentService {
 	
 	public Integer getSize(Http.Request request) {
 		user = getUser(request);
-		if(hasPermission(request, null, readFunction)) {
+		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.all().size();
 		} else {
 			return Transaction.find.query().where().eq("types.name", "payment").and().eq("users.id", user.id).findList().size();
@@ -101,7 +101,7 @@ public class PaymentService {
 	}
 	
 	public Transaction update(Http.Request request, Long id) {
-		if(hasPermission(request, id, updateFunction)) { 
+		if(hasPermission(request, id, updatePermission)) { 
 			transaction = Transaction.find.byId(id);
 //			transactionNode = (ObjectNode) request.body().asJson().get("payment");
 //			transaction.amount = transactionNode.findValue("amount").asDouble();	
@@ -114,7 +114,7 @@ public class PaymentService {
 	}
 	
 	public Transaction delete(Http.Request request, Long id) {
-		if(hasPermission(request, id, deleteFunction)) { 
+		if(hasPermission(request, id, deletePermission)) { 
 			transaction = Transaction.find.byId(id);
 			transaction.status = "deleted";
 			transaction.update();
@@ -125,7 +125,7 @@ public class PaymentService {
 		}
 	}
 	
-	public Boolean hasPermission(Http.Request request, Long id, Function function) {
+	public Boolean hasPermission(Http.Request request, Long id, Permission function) {
 		user = getUser(request);
 		role = user.roles.get(0);
 		
@@ -141,7 +141,7 @@ public class PaymentService {
 				return false;
 			}
 		} else {
-			if(role.functions.contains(function)) {
+			if(role.permissions.contains(function)) {
 				return true;
 			} else {
 				return false;

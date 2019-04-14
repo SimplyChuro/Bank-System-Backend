@@ -33,7 +33,7 @@ public class Role extends Model {
 	public List<User> users = new ArrayList<>();
 	
 	@ManyToMany
-	public List<Function> functions = new ArrayList<>();
+	public List<Permission> permissions = new ArrayList<>();
 	
 
 	public static final Finder<Long, Role> find = new Finder<>(Role.class);
