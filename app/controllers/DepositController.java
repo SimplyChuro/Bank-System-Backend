@@ -7,7 +7,6 @@ import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
 
 import models.Transaction;
-import models.User;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Controller;
@@ -16,7 +15,6 @@ import play.mvc.Result;
 import play.mvc.Security;
 import services.DepositService;
 import services.Secured;
-import services.UserService;
 
 public class DepositController  extends Controller {
 
@@ -25,6 +23,8 @@ public class DepositController  extends Controller {
 	private DepositService depositService = new DepositService();
 	private List<Transaction> deposits;
 	private int size;
+	private int min, max;
+	private static final int itemsPerPage = 10;
 	
 	@Inject
     public DepositController(HttpExecutionContext ec) {
@@ -50,9 +50,11 @@ public class DepositController  extends Controller {
 	
 	//Get deposit
 	@Security.Authenticated(Secured.class)
-	public CompletionStage<Result> getAll(Http.Request request, Integer min, Integer max) {
+	public CompletionStage<Result> getAll(Http.Request request, Integer page) {
 		return calculateResponse().thenApplyAsync(answer -> {
 			try {
+				min = itemsPerPage * page - itemsPerPage;
+				max = itemsPerPage * page;
 				deposits = depositService.getAll(request, min, max);
 				return ok(Json.toJson(deposits));
 			} catch(Exception e) {

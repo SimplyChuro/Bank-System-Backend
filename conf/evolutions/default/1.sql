@@ -39,6 +39,7 @@ create table transactions (
   id                            bigserial not null,
   amount                        float,
   status                        varchar(255),
+  sender                        varchar(255),
   date                          timestamptz,
   type_id                       bigint,
   constraint pk_transactions primary key (id)

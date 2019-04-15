@@ -32,7 +32,7 @@ public class Role extends Model {
 	@ManyToMany(mappedBy = "roles") @JsonIgnore
 	public List<User> users = new ArrayList<>();
 	
-	@ManyToMany
+	@ManyToMany @JsonIgnore
 	public List<Permission> permissions = new ArrayList<>();
 	
 

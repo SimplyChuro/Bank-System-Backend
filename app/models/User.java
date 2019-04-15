@@ -41,8 +41,8 @@ public class User extends Model {
 	public String bankAccount;
 	
 	public Double balance;
-    
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="GMT")
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT")
 	@Formats.DateTime(pattern="dd/MM/yyyy")
 	public Date date;
 	
@@ -55,7 +55,7 @@ public class User extends Model {
 	@ManyToMany
 	public List<Role> roles = new ArrayList<>();
 	
-	@ManyToMany
+	@ManyToMany @JsonIgnore
 	public List<Transaction> transactions = new ArrayList<>();
 	
 	

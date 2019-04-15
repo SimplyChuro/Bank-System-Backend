@@ -31,7 +31,9 @@ public class Transaction extends Model {
 	
 	public String status;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="GMT")
+	public String sender;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT")
 	@Formats.DateTime(pattern="dd/MM/yyyy")
 	public Date date;
 	
@@ -41,7 +43,7 @@ public class Transaction extends Model {
 	@ManyToMany(mappedBy = "transactions") @JsonIgnore
 	public List<User> users = new ArrayList<>();
 	
-	@ManyToOne 
+	@ManyToOne @JsonIgnore
 	public Type type;
 	
 

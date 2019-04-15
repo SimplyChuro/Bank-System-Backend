@@ -7,25 +7,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.Permission;
 import models.Role;
-import models.Transaction;
-import models.Type;
 import models.User;
 import play.mvc.Http;
 
 public class UserService {
 	
 	private User user;
-	private List<User> users;
 	private ObjectNode userNode;
 	private Role role;
+	private Role userRole = Role.find.query().where().eq("name", "user").findOne();
 	private Permission createPermission = Permission.find.query().where().eq("name", "create_user").findOne();
 	private Permission readPermission = Permission.find.query().where().eq("name", "read_user").findOne();
 	private Permission updatePermission = Permission.find.query().where().eq("name", "update_user").findOne();
 	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_user").findOne();
 	
 	public User getUser(Http.Request request) {
-		Long checker = Long.parseLong(request.session().getOptional("id").get());
-	    return User.find.byId(checker);
+		String token = request.session().getOptional("auth_token").get();
+	    return User.findByAuthToken(token);
 	}
 	
 	public User get(Http.Request request, Long id) {
@@ -65,6 +63,7 @@ public class UserService {
 		user.surname = userNode.findValue("surname").asText();
 		user.email = userNode.findValue("email").asText();
 		user.setPassword(userNode.findValue("password").asText());
+		user.roles.add(userRole);
 		user.date = new Date();
 		user.bankAccount = user.name + "_" + user.surname + "_" + user.date.getTime();
 		user.balance = 0.0;
@@ -81,8 +80,8 @@ public class UserService {
 			
 			user.name = userNode.findValue("name").asText();
 			user.surname = userNode.findValue("surname").asText();
-			user.email = userNode.findValue("email").asText();
-			user.setPassword(userNode.findValue("password").asText());
+//			user.email = userNode.findValue("email").asText();
+//			user.setPassword(userNode.findValue("password").asText());
 			user.bankAccount = userNode.findValue("bankAccount").asText();
 			
 			user.update();

@@ -1,6 +1,5 @@
 package controllers;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,6 +35,8 @@ public class PictureController  extends Controller {
 	private Picture picture;
 	private List<Picture> pictures;
 	private int size;
+	private int min, max;
+	private static final int itemsPerPage = 10;
 	private static final String IMAGE_URL = "custom.settings.host.imageUrl";
 	
 	@Inject
@@ -65,9 +66,11 @@ public class PictureController  extends Controller {
 	
 	//Get pictures
 	@Security.Authenticated(Secured.class)
-	public CompletionStage<Result> getAll(Http.Request request, Integer min, Integer max) {
+	public CompletionStage<Result> getAll(Http.Request request, Integer page) {
 		return calculateResponse().thenApplyAsync(answer -> {
 			try {
+				min = itemsPerPage * page - itemsPerPage;
+				max = itemsPerPage * page;
 				pictures = Picture.find.query()
 						.where()
 						.orderBy("published desc")

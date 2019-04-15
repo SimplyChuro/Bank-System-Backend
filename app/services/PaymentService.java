@@ -1,5 +1,6 @@
 package services;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,10 +27,12 @@ public class PaymentService {
 	private Permission readPermission = Permission.find.query().where().eq("name", "read_payment").findOne();
 	private Permission updatePermission = Permission.find.query().where().eq("name", "update_payment").findOne();
 	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_payment").findOne();
+	private DecimalFormat decimalFormat = new DecimalFormat("#.##");
+	private Double amount;
 	
 	public User getUser(Http.Request request) {
-		Long checker = Long.parseLong(request.session().getOptional("id").get());
-	    return User.find.byId(checker);
+		String token = request.session().getOptional("auth_token").get();
+	    return User.findByAuthToken(token);
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
@@ -45,7 +48,7 @@ public class PaymentService {
 		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.query()
 					.where()
-					.eq("types.name", "payment")
+					.eq("type.name", "payment")
 					.orderBy("date desc")
 					.setFirstRow(min)
 			        .setMaxRows(max)
@@ -53,7 +56,7 @@ public class PaymentService {
 		} else {
 			return Transaction.find.query()
 					.where()
-					.eq("types.name", "payment").and().eq("users.id", user.id)
+					.eq("type.name", "payment").and().eq("users.id", user.id)
 					.orderBy("date desc")
 					.setFirstRow(min)
 			        .setMaxRows(max)
@@ -64,9 +67,9 @@ public class PaymentService {
 	public Integer getSize(Http.Request request) {
 		user = getUser(request);
 		if(hasPermission(request, null, readPermission)) {
-			return Transaction.find.all().size();
+			return Transaction.find.query().where().eq("type.name", "payment").findList().size();
 		} else {
-			return Transaction.find.query().where().eq("types.name", "payment").and().eq("users.id", user.id).findList().size();
+			return Transaction.find.query().where().eq("type.name", "payment").and().eq("users.id", user.id).findList().size();
 		}
 	}
 	
@@ -79,22 +82,31 @@ public class PaymentService {
 			bankAccount = transactionNode.findValue("bankAccount").asText();
 			reciever = User.find.query().where().eq("bankAccount", bankAccount).findOne();
 			
-			transaction.amount = transactionNode.findValue("amount").asDouble();
-			transaction.date = new Date();
-			transaction.status = "active";
-			transaction.type = paymentType;
-			
-			transaction.users.add(user);
-			transaction.users.add(reciever);
-			
-			transaction.save();
-			
-			user.balance -= transaction.amount;
-			reciever.balance += transaction.amount;
-			user.update();
-			reciever.update();
-			
-			return transaction;
+			amount = Double.parseDouble(decimalFormat.format(transactionNode.findValue("amount").asDouble()));
+			if(user.balance >= amount) {
+				if(!user.bankAccount.equals(bankAccount)) {
+					transaction.amount = transactionNode.findValue("amount").asDouble();
+					transaction.date = new Date();
+					transaction.status = "active";
+					transaction.type = paymentType;
+					transaction.sender = user.id.toString();
+					transaction.users.add(user);
+					transaction.users.add(reciever);
+					transaction.save();
+					
+					user.balance -= transaction.amount;
+					reciever.balance += transaction.amount;
+					
+					user.update();
+					reciever.update();
+	
+					return transaction;
+				} else {
+					throw new IllegalArgumentException();
+				}
+			} else {
+				throw new IllegalArgumentException();
+			}
 		} else {
 			throw new IllegalArgumentException();
 		}

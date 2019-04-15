@@ -1,5 +1,6 @@
 package services;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,10 +26,12 @@ public class DepositService {
 	private Permission readPermission = Permission.find.query().where().eq("name", "read_deposit").findOne();
 	private Permission updatePermission = Permission.find.query().where().eq("name", "update_deposit").findOne();
 	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_deposit").findOne();
+	private DecimalFormat decimalFormat = new DecimalFormat("#.##");
+	private Double amount;
 	
 	public User getUser(Http.Request request) {
-		Long checker = Long.parseLong(request.session().getOptional("id").get());
-	    return User.find.byId(checker);
+		String token = request.session().getOptional("auth_token").get();
+	    return User.findByAuthToken(token);
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
@@ -44,7 +47,7 @@ public class DepositService {
 		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.query()
 					.where()
-					.eq("types.name", "deposit")
+					.eq("type.name", "deposit")
 					.orderBy("date desc")
 					.setFirstRow(min)
 			        .setMaxRows(max)
@@ -52,7 +55,7 @@ public class DepositService {
 		} else {
 			return Transaction.find.query()
 					.where()
-					.eq("types.name", "deposit").and().eq("users.id", user.id)
+					.eq("type.name", "deposit").and().eq("users.id", user.id)
 					.orderBy("date desc")
 					.setFirstRow(min)
 			        .setMaxRows(max)
@@ -63,9 +66,9 @@ public class DepositService {
 	public Integer getSize(Http.Request request) {
 		user = getUser(request);
 		if(hasPermission(request, null, readPermission)) {
-			return Transaction.find.all().size();
+			return Transaction.find.query().where().eq("type.name", "deposit").findList().size();
 		} else {
-			return Transaction.find.query().where().eq("types.name", "deposit").and().eq("users.id", user.id).findList().size();
+			return Transaction.find.query().where().eq("type.name", "deposit").and().eq("users.id", user.id).findList().size();
 		}
 	}
 	
@@ -75,17 +78,23 @@ public class DepositService {
 			user = getUser(request);
 			transactionNode = (ObjectNode) request.body().asJson().get("deposit");
 			
-			transaction.amount = transactionNode.findValue("amount").asDouble();
-			transaction.date = new Date();
-			transaction.status = "active";
-			transaction.type = depositType;
-			transaction.users.add(user);
-			transaction.save();
-			
-			user.balance += transaction.amount;
-			user.update();
-			
-			return transaction;
+			amount = Double.parseDouble(decimalFormat.format(transactionNode.findValue("amount").asDouble()));
+			if(amount > 0.00) {
+				transaction.amount = Double.parseDouble(decimalFormat.format(transactionNode.findValue("amount").asDouble()));
+				transaction.date = new Date();
+				transaction.status = "active";
+				transaction.type = depositType;
+				transaction.sender = user.id.toString();
+				transaction.users.add(user);
+				transaction.save();
+				
+				user.balance += transaction.amount;
+				user.update();
+				
+				return transaction;
+			} else {
+				throw new IllegalArgumentException();
+			}
 		} else {
 			throw new IllegalArgumentException();
 		}

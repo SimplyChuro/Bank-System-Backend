@@ -1,5 +1,6 @@
 package services;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,10 +26,12 @@ public class WithdrawalService {
 	private Permission readPermission = Permission.find.query().where().eq("name", "read_withdrawal").findOne();
 	private Permission updatePermission = Permission.find.query().where().eq("name", "update_withdrawal").findOne();
 	private Permission deletePermission = Permission.find.query().where().eq("name", "delete_withdrawal").findOne();
+	private DecimalFormat decimalFormat = new DecimalFormat("#.##");
+	private Double amount;
 	
 	public User getUser(Http.Request request) {
-		Long checker = Long.parseLong(request.session().getOptional("id").get());
-	    return User.find.byId(checker);
+		String token = request.session().getOptional("auth_token").get();
+	    return User.findByAuthToken(token);
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
@@ -44,7 +47,7 @@ public class WithdrawalService {
 		if(hasPermission(request, null, readPermission)) {
 			return Transaction.find.query()
 					.where()
-					.eq("types.name", "withdrawal")
+					.eq("type.name", "withdrawal")
 					.orderBy("date desc")
 					.setFirstRow(min)
 			        .setMaxRows(max)
@@ -52,7 +55,7 @@ public class WithdrawalService {
 		} else {
 			return Transaction.find.query()
 					.where()
-					.eq("types.name", "withdrawal").and().eq("users.id", user.id)
+					.eq("type.name", "withdrawal").and().eq("users.id", user.id)
 					.orderBy("date desc")
 					.setFirstRow(min)
 			        .setMaxRows(max)
@@ -63,9 +66,9 @@ public class WithdrawalService {
 	public Integer getSize(Http.Request request) {
 		user = getUser(request);
 		if(hasPermission(request, null, readPermission)) {
-			return Transaction.find.all().size();
+			return Transaction.find.query().where().eq("type.name", "withdrawal").findList().size();
 		} else {
-			return Transaction.find.query().where().eq("types.name", "withdrawal").and().eq("users.id", user.id).findList().size();
+			return Transaction.find.query().where().eq("type.name", "withdrawal").and().eq("users.id", user.id).findList().size();
 		}
 	}
 	
@@ -75,17 +78,23 @@ public class WithdrawalService {
 			user = getUser(request);
 			transactionNode = (ObjectNode) request.body().asJson().get("withdrawal");
 			
-			transaction.amount = transactionNode.findValue("amount").asDouble();
-			transaction.date = new Date();
-			transaction.status = "active";
-			transaction.type = withdrawalType;
-			transaction.users.add(user);
-			transaction.save();
-			
-			user.balance -= transaction.amount;
-			user.update();
-			
-			return transaction;
+			amount = Double.parseDouble(decimalFormat.format(transactionNode.findValue("amount").asDouble()));
+			if(user.balance >= amount) {
+				transaction.amount = amount;
+				transaction.date = new Date();
+				transaction.status = "active";
+				transaction.type = withdrawalType;
+				transaction.sender = user.id.toString();
+				transaction.users.add(user);
+				transaction.save();
+				
+				user.balance -= transaction.amount;
+				user.update();
+				
+				return transaction;
+			} else {
+				throw new IllegalArgumentException();
+			}
 		} else {
 			throw new IllegalArgumentException();
 		}

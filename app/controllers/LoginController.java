@@ -20,9 +20,6 @@ import play.mvc.Security;
 import services.Secured;
 
 public class LoginController extends Controller {
-
-	public final static String AUTH_TOKEN_HEADER = "X-AUTH-TOKEN";
-	public final static String AUTH_TOKEN = "authToken";
 	
 	private HttpExecutionContext httpExecutionContext;
 	private User user;
@@ -38,6 +35,12 @@ public class LoginController extends Controller {
         return CompletableFuture.completedFuture("42");
     }
 	
+	//Parse user	
+	public User getUser(Http.Request request) {
+		String token = request.session().getOptional("auth_token").get();
+	    return User.findByAuthToken(token);
+	}
+	
 	//Login method
 	public CompletionStage<Result> login(Http.Request request) {
 	    return calculateResponse().thenApplyAsync(answer -> {
@@ -51,8 +54,11 @@ public class LoginController extends Controller {
 			    		.findOne();	 
 			    
 			    if (BCrypt.checkpw(jsonNode.findPath("password").textValue(), user.getPassword())) {   
-			    	response.put("token", request.session().toString());
-			        return ok(response).addingToSession(request, "id", user.id.toString());    
+			    	user.createToken();
+			    	response.put("token", user.getAuthToken());
+			    	response.put("id", user.id);
+			    	response.put("role", user.roles.get(0).name);
+			        return ok(response).addingToSession(request, "id", user.id.toString()).addingToSession(request, "auth_token",  user.getAuthToken());    
 		        } else {
 		        	response.put("error_message", "Incorrect email or password");
 			    	return notFound(response);
@@ -68,7 +74,8 @@ public class LoginController extends Controller {
 	@Security.Authenticated(Secured.class)
 	public CompletionStage<Result> logout(Http.Request request) {
 	    return calculateResponse().thenApplyAsync(answer -> {
-	    	return ok(Json.toJson("")).removingFromSession(request, "id");
+	    	getUser(request).deleteAuthToken();
+	    	return ok(Json.toJson("")).removingFromSession(request, "id").removingFromSession(request, "auth_token");
 	    }, httpExecutionContext.current());
     }
 	

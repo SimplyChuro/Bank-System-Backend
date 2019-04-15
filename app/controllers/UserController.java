@@ -24,6 +24,8 @@ public class UserController  extends Controller {
 	private UserService userService = new UserService();
 	private List<User> users;
 	private int size;
+	private int min, max;
+	private static final int itemsPerPage = 10;
 	
 	@Inject
     public UserController(HttpExecutionContext ec) {
@@ -49,9 +51,11 @@ public class UserController  extends Controller {
 	
 	//Get users
 	@Security.Authenticated(Secured.class)
-	public CompletionStage<Result> getAll(Http.Request request, Integer min, Integer max) {
+	public CompletionStage<Result> getAll(Http.Request request, Integer page) {
 		return calculateResponse().thenApplyAsync(answer -> {
 			try {
+				min = itemsPerPage * page - itemsPerPage;
+				max = itemsPerPage * page;
 				users = userService.getAll(request, min, max);
 				return ok(Json.toJson(users));
 			} catch(Exception e) {
