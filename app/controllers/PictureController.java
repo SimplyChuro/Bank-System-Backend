@@ -11,10 +11,10 @@ import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.typesafe.config.ConfigFactory;
 
 import models.Picture;
+import models.User;
 import play.libs.Json;
 import play.libs.Files.TemporaryFile;
 import play.libs.concurrent.HttpExecutionContext;
@@ -31,9 +31,9 @@ public class PictureController  extends Controller {
 	private PictureFilter filter = new PictureFilter();
 	private HttpExecutionContext httpExecutionContext;
 	private JsonNode jsonNode;
-	private ObjectNode objectNode;
 	private Picture picture;
 	private List<Picture> pictures;
+	private User user;
 	private int size;
 	private int min, max;
 	private static final int itemsPerPage = 10;
@@ -50,6 +50,12 @@ public class PictureController  extends Controller {
 	private static CompletionStage<String> calculateResponse() {
         return CompletableFuture.completedFuture("42");
     }
+	
+	//Get User
+	public User getUser(Http.Request request) {
+		String token = request.session().getOptional("auth_token").get();
+	    return User.findByAuthToken(token);
+	}
 	
 	//Get picture
 	@Security.Authenticated(Secured.class)	
@@ -133,18 +139,33 @@ public class PictureController  extends Controller {
 				            Date currentDate = new Date();
 				            String customName = currentDate.getTime() + "_" + fileName;
 			                
-				            Picture newPicture = new Picture();
+				            picture = new Picture();
 				            
-				            newPicture.name = customName;
-				            newPicture.published = currentDate;
-				            newPicture.type = contentType;
-				            newPicture.url = ConfigFactory.load().getString(IMAGE_URL) + customName;
+				            picture.name = customName;
+				            picture.published = currentDate;
+				            picture.type = contentType;
+				            picture.url = ConfigFactory.load().getString(IMAGE_URL) + customName;
 				            
 				            File newFile = new File(environment.rootPath().toString() + "//public//images//" + customName);
 			                file.moveFileTo(newFile);
 			            
-			                newPicture.save();
-				            return ok(Json.toJson(newPicture));	
+			                picture.save();
+
+				            user = getUser(request);
+				            
+				            if(user.avatar != null) {
+								Files.deleteIfExists(Paths.get(environment.rootPath().toString() + "//public//images//" + user.avatar.name));
+								user.avatar.status = "deleted";
+								user.avatar.update();
+								
+								user.avatar = picture;
+								user.update();
+							} else {
+								user.avatar = picture;
+								user.update();
+							}
+			                
+				            return ok(Json.toJson(picture));	
 		                } else {
 		                    return badRequest();    
 		                }
@@ -165,12 +186,7 @@ public class PictureController  extends Controller {
 	public CompletionStage<Result> update(Http.Request request, Long id) {
 		return calculateResponse().thenApplyAsync(answer -> {	
 			try {
-				jsonNode = request.body().asJson();
 				picture = Picture.find.byId(id);
-				picture.name = jsonNode.findValue("name").asText();
-				picture.url = jsonNode.findValue("url").asText();
-				picture.published = new Date();
-				picture.update();
 				return ok(Json.toJson(picture));
 			} catch(Exception e) {
 				return badRequest();
@@ -183,11 +199,21 @@ public class PictureController  extends Controller {
 	public CompletionStage<Result> delete(Http.Request request, Long id) {
 		return calculateResponse().thenApplyAsync(answer -> {
 			try {
-				picture = Picture.find.byId(id);
-				Files.deleteIfExists(Paths.get(environment.rootPath().toString() + "//public//images//" + picture.name));
-				
-				picture.delete();
-				return ok(Json.toJson(""));
+				user = getUser(request);
+				if(user.avatar.id == id) {
+					picture = Picture.find.byId(id);
+					Files.deleteIfExists(Paths.get(environment.rootPath().toString() + "//public//images//" + picture.name));
+					
+					picture.status = "deleted";
+					picture.update();
+					
+					user.avatar = null;
+					user.update();
+					
+					return ok(Json.toJson(""));
+				} else {
+					return badRequest();
+				}
 			} catch(Exception e) {
 				return badRequest();
 			}

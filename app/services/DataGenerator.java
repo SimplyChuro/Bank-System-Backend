@@ -93,7 +93,7 @@ public class DataGenerator {
 	
 	public void generateFunctions() {
 		
-		//User functions		
+		//User permissions		
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "create_user";
@@ -123,7 +123,7 @@ public class DataGenerator {
 		adminPermissions.add(permission);
 		moderatorPermissions.add(permission);
 		
-		//Deposit functions		
+		//Deposit permissions		
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "create_deposit";
@@ -153,7 +153,7 @@ public class DataGenerator {
 		adminPermissions.add(permission);
 		moderatorPermissions.add(permission);
 		
-		//Payment function		
+		//Payment permissions		
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "create_payment";
@@ -183,7 +183,7 @@ public class DataGenerator {
 		adminPermissions.add(permission);
 		moderatorPermissions.add(permission);
 		
-		//Withdrawal function		
+		//Withdrawal permissions		
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "create_withdrawal";
@@ -212,8 +212,37 @@ public class DataGenerator {
 		permission.save();
 		adminPermissions.add(permission);
 		moderatorPermissions.add(permission);
+			
+		//Picture permissions		
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "create_picture";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
 		
-		//Staff function		
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "read_picture";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "update_picture";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		
+		permission = new Permission();
+		permission.status = "active";
+		permission.name = "delete_picture";
+		permission.save();
+		adminPermissions.add(permission);
+		moderatorPermissions.add(permission);
+		
+		//Staff permissions		
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "create_staff";
@@ -242,7 +271,7 @@ public class DataGenerator {
 		adminPermissions.add(permission);
 		moderatorPermissions.add(permission);
 		
-		//Moderator function		
+		//Moderator permissions		
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "create_moderator";
@@ -264,31 +293,6 @@ public class DataGenerator {
 		permission = new Permission();
 		permission.status = "active";
 		permission.name = "delete_moderator";
-		permission.save();
-		adminPermissions.add(permission);
-		
-		//Admin function		
-		permission = new Permission();
-		permission.status = "active";
-		permission.name = "create_admin";
-		permission.save();
-		adminPermissions.add(permission);
-		
-		permission = new Permission();
-		permission.status = "active";
-		permission.name = "read_admin";
-		permission.save();
-		adminPermissions.add(permission);
-		
-		permission = new Permission();
-		permission.status = "active";
-		permission.name = "update_admin";
-		permission.save();
-		adminPermissions.add(permission);
-		
-		permission = new Permission();
-		permission.status = "active";
-		permission.name = "delete_admin";
 		permission.save();
 		adminPermissions.add(permission);
 			

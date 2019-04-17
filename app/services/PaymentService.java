@@ -19,7 +19,7 @@ public class PaymentService {
 	private Transaction transaction;
 	private List<Transaction> transactions;
 	private ObjectNode transactionNode;
-	private User user, reciever;
+	private User user, userChecker, reciever;
 	private Role role;
 	private String bankAccount;
 	private Type paymentType = Type.find.query().where().eq("name", "payment").findOne();
@@ -36,7 +36,7 @@ public class PaymentService {
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
-		if(hasPermission(request, id, createPermission)) {
+		if(hasPermission(request, id, readPermission)) {
 			return Transaction.find.byId(id);
 		} else {
 			throw new IllegalArgumentException();
@@ -74,7 +74,7 @@ public class PaymentService {
 	}
 	
 	public Transaction create(Http.Request request) {
-		if(isUserRole(request)) {
+		if(isUser(request)) {
 			transaction = new Transaction();
 			user = getUser(request);
 			transactionNode = (ObjectNode) request.body().asJson().get("payment");
@@ -138,10 +138,8 @@ public class PaymentService {
 	}
 	
 	public Boolean hasPermission(Http.Request request, Long id, Permission function) {
-		user = getUser(request);
-		role = user.roles.get(0);
-		
-		if(role.name.equals("user")) {
+		userChecker = getUser(request);
+		if(isUser(request)) {
 			try {
 				transactions = Transaction.find.query().where().eq("users.id", user.id).and().eq("id", id).findList();
 				if(transactions.isEmpty()) {
@@ -161,10 +159,40 @@ public class PaymentService {
 		}
 	}
 	
-	public Boolean isUserRole(Http.Request request) {
-		user = getUser(request);
-		role = user.roles.get(0);
+	public Boolean isUser(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
 		if(role.name.equals("user")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Boolean isStaff(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
+		if(role.name.equals("staff")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Boolean isModerator(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
+		if(role.name.equals("moderator")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Boolean isAdmin(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
+		if(role.name.equals("admin")) {
 			return true;
 		} else {
 			return false;

@@ -19,7 +19,7 @@ public class WithdrawalService {
 	private Transaction transaction;
 	private List<Transaction> transactions;
 	private ObjectNode transactionNode;
-	private User user;
+	private User user, userChecker;
 	private Role role;
 	private Type withdrawalType = Type.find.query().where().eq("name", "withdrawal").findOne();
 	private Permission createPermission = Permission.find.query().where().eq("name", "create_withdrawal").findOne();
@@ -35,7 +35,7 @@ public class WithdrawalService {
 	}
 	
 	public Transaction get(Http.Request request, Long id) {
-		if(hasPermission(request, id, createPermission)) {
+		if(hasPermission(request, id, readPermission)) {
 			return Transaction.find.byId(id);
 		} else {
 			throw new IllegalArgumentException();
@@ -73,7 +73,7 @@ public class WithdrawalService {
 	}
 	
 	public Transaction create(Http.Request request) {
-		if(isUserRole(request)) {
+		if(isUser(request)) {
 			transaction = new Transaction();
 			user = getUser(request);
 			transactionNode = (ObjectNode) request.body().asJson().get("withdrawal");
@@ -126,10 +126,8 @@ public class WithdrawalService {
 	}
 	
 	public Boolean hasPermission(Http.Request request, Long id, Permission function) {
-		user = getUser(request);
-		role = user.roles.get(0);
-		
-		if(role.name.equals("user")) {
+		userChecker = getUser(request);
+		if(isUser(request)) {
 			try {
 				transactions = Transaction.find.query().where().eq("users.id", user.id).and().eq("id", id).findList();
 				if(transactions.isEmpty()) {
@@ -149,10 +147,40 @@ public class WithdrawalService {
 		}
 	}
 	
-	public Boolean isUserRole(Http.Request request) {
-		user = getUser(request);
-		role = user.roles.get(0);
+	public Boolean isUser(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
 		if(role.name.equals("user")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Boolean isStaff(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
+		if(role.name.equals("staff")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Boolean isModerator(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
+		if(role.name.equals("moderator")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Boolean isAdmin(Http.Request request) {
+		userChecker = getUser(request);
+		role = userChecker.roles.get(0);
+		if(role.name.equals("admin")) {
 			return true;
 		} else {
 			return false;
